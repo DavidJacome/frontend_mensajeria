@@ -1,0 +1,45 @@
+body {
+    background-color: #9AD1ED!important;
+}
+
+.line {
+    background-color: #39A1E5;
+    height: 6px;
+}
+
+.centrar {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section {
+    width: 500px;
+    background-color: #e9e9e9;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.text-color{
+    color: #8a8c8b;
+    text-align: center;
+    font-weight:640;
+}
+
+.form {
+    padding: 25px;
+}
+
+.full-div {
+    height: 100vh;
+    display: flex;
+    place-items: center;
+}
+
+.form-center{
+    border-top: 1px solid; 
+    border-color: #8a8c8b;
+    padding-top: 5px;
+}
+
+.btn {
+    border-radius: 2px!important;
+}
