@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/all.min.css" />
 
-    <title>login</title>
+    <title>Login</title>
   </head>
   <body>
     <div class="login_container">
@@ -19,16 +19,12 @@
 
       <form class="login_form">
 
-        <input
-          type="email"
-          placeholder="&#128100;correo"
-          required
-          autofocus
-        />
-        <input type="password"  placeholder="&#x1f512; password" required />
-        <input class="btn_submit" type="submit" value="Entrar" />
-        <label>No tienes aun cuenta? <a class="form_recover" href="">registrate</a></label>
+        <input id="telefono" type="text" placeholder="&#128241; Número de Teléfono" required autofocus/>
+        <input id="contrasena" type="password"  placeholder="&#x1f512; Password" required />
+        <input onclick="login()" class="btn_submit" type="submit" value="Entrar" />
+        <label>No tienes aun cuenta? <a class="form_recover" href="registro.html">Regístrate</a></label>
       </form>
     </div>
+    <script src="js/controlador.js" type="text/javascript"></script>
   </body>
 </html>

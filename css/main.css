@@ -62,7 +62,7 @@ body{
 
 }
 
-input[type= email], [type=password]
+input[type= text], [type=password]
 {
   
     margin: .5rem 0;
