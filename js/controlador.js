@@ -1,4 +1,4 @@
-var usuarioLogiado;
+var usuarioLogueado;
 
 //Inicio de Sesión
 function IniciarSesion(){
@@ -16,9 +16,19 @@ function IniciarSesion(){
         },
             
         success:(res)=>{
-            usuarioLogiado= res,
-            console.log("esta es mi data ", usuarioLogiado);
+            usuarioLogueado= res,
+            console.log("esta es mi data ", usuarioLogueado);
             window.location.href = '../chat2.html';
+            if (localStorage.getItem('usuario')!=null) {
+                usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
+                //usuarioLogueado.push(agregarProducto);
+                localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
+            } else {
+                
+                localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
+            }
+            //window.location.href = '../chat2.html';
+
         },
         error:(error)=>{
             console.error("este esun error", error);
@@ -69,4 +79,6 @@ function RegistrarUsuario(){
     }
     
 }
+
+
 

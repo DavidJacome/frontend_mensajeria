@@ -1,3 +1,75 @@
+var usuarioLogueado;
+var contactos=[];
+var conversaciones=[];
+var usuariosContactos;
+(()=>{
+	usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
+	console.log(usuarioLogueado);
+	contactos=usuarioLogueado.contactos;
+	conversaciones=usuarioLogueado.conversaciones;
+	$("#profile").append(
+		`<div class="wrap">
+	<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
+	<p>${usuarioLogueado.nombre}</p>
+    </div>`
+	);
+    for (let i = 0; i < conversaciones.length; i++) {
+	$("#conversaciones").append(
+			`<li class="contact">
+				<div class="wrap">
+					<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+					<div class="meta">
+						<p class="name">${conversaciones[i].nombreDestinatario}</p>
+						<p class="preview">${conversaciones[i].ultimoMensaje}</p>
+						<small>${conversaciones[i].horaUltimoMensaje}</small>
+					</div>
+				</div>
+			</li>`)
+		}
+
+	$("#ajusteUsuario").append(`<div   style="margin-bottom: 10px;">
+	<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="mr-auto ml-auto" alt="" />
+	<p style="display: block; text-align: center; margin-top: 5px;">${usuarioLogueado.nombre} <a href="#" class="fa fa-pencil fa-fw"></a></p>
+</div>
+<input  style="margin-bottom: 10px;" type="text" class="form-control" placeholder="Estado" value ="${usuarioLogueado.estado}">
+<button type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal-change-password">Cambiar Contraseña</button>
+<a type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-danger" href="login.html">Cerrar Sesión</a>
+`)
+
+
+for (let j = 0; j < contactos.length; j++) {
+	console.log("este es inidce", contactos[j])
+	$.ajax({
+        url:`http://localhost:8888/usuarios/${contactos[j]}`,
+        method:"GET",
+        dataType:"json",
+        data:{},
+            
+        success:(res)=>{
+			console.log(res);
+			$("#nuevoMensaje").append(
+				`<li class="contact">
+				<div class="wrap">
+					<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+					<div class="meta">
+						<p class="name">${res.nombre}</p>
+					</div>
+				</div>
+			</li>`)
+         
+        },
+        error:(error)=>{
+            console.error(error);
+        }
+    });
+	
+		}
+
+	
+})();
+
+
+
 
 $(".messages").animate({ scrollTop: $(document).height() }, "fast");
 
@@ -54,3 +126,5 @@ $(window).on('keydown', function(e) {
     return false;
   }
 });
+
+
