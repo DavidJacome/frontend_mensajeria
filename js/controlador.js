@@ -4,9 +4,9 @@ var usuarioLogueado;
 function IniciarSesion(){
     var telefono = document.getElementById('telefono').value;
     var contrasena = document.getElementById('contrasena').value;
-    console.log("me estas presioando")
+    console.log("me estas presionando")
     $.ajax({
-        url:'http://localhost:8081/usuarios/login',
+        url:'http://localhost:8888/usuarios/login',
         method:"POST",
         dataType:"json",
         data:
@@ -49,7 +49,7 @@ function RegistrarUsuario(){
      
     if(contrasena==confirmarContrasena){
         $.ajax({
-            url:'http://localhost:8081/usuarios/registro',
+            url:'http://localhost:8888/usuarios/registro',
             method:"POST",
             dataType:"json",
             data:

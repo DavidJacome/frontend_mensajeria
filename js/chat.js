@@ -2,6 +2,24 @@ var usuarioLogueado;
 var contactos=[];
 var conversaciones=[];
 var usuariosContactos;
+
+var imagenes = [
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208957/Mensajeria/Usuarios/hg3zcmbd3eci74quyjlt.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208957/Mensajeria/Usuarios/pm9av5tpshjbjf79zk8v.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208957/Mensajeria/Usuarios/tcjenrwkfjvbrclx6ex4.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/z0dnhzrsy59d910laifs.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/p23ocjiivcvouo9lttil.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/gtymx7rptogninh93x2m.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/zdaqeo56d1axme3kbnkv.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/c9qlcgle78sak1fi78js.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/nlnx2lude1chhqrqx41w.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/skflwtgumtk9suc6sup1.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/rogpjnugbb1noulxce2g.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/qg0pbfkzt47jmvkwgtss.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/fkrzfq1lduisa9x0wtuo.png',
+	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/nlq1dzsn4bs0c6dtdoj0.png'
+];
+
 (()=>{
 	usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
 	console.log(usuarioLogueado);
@@ -27,20 +45,20 @@ var usuariosContactos;
 			</li>`)
 		}
 
-	$("#ajusteUsuario").append(`<div   style="margin-bottom: 10px;">
-	<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="mr-auto ml-auto" alt="" />
-	<p style="display: block; text-align: center; margin-top: 5px;">${usuarioLogueado.nombre} <a href="#" class="fa fa-pencil fa-fw"></a></p>
-</div>
-<input  style="margin-bottom: 10px;" type="text" class="form-control" placeholder="Estado" value ="${usuarioLogueado.estado}">
-<button type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal-change-password">Cambiar Contraseña</button>
-<a type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-danger" href="login.html">Cerrar Sesión</a>
+	$("#ajusteUsuario").append(`
+	<div   style="margin-bottom: 10px;">
+		<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="mr-auto ml-auto" alt="" />
+		<p style="display: block; text-align: center; margin-top: 5px;">${usuarioLogueado.nombre} <a href="#" class="fa fa-pencil fa-fw"></a></p>
+	</div>
+	<input  style="margin-bottom: 10px;" type="text" class="form-control" placeholder="Estado" value ="${usuarioLogueado.estado}">
+	<button type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal-change-password">Cambiar Contraseña</button>
+	<a type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</a>
 `)
-
 
 for (let j = 0; j < contactos.length; j++) {
 	console.log("este es inidce", contactos[j])
 	$.ajax({
-        url:`http://localhost:8081/usuarios/${contactos[j]}`,
+        url:`http://localhost:8888/usuarios/${contactos[j]}`,
         method:"GET",
         dataType:"json",
         data:{},
@@ -63,22 +81,45 @@ for (let j = 0; j < contactos.length; j++) {
         }
     });
 	
-		}
+}
 
-	
 })();
 
+function cerrarSesion(){
+	window.location.href = '../login.html';
+	localStorage.clear();
+}
+
 function MostrarConversaciones(id) {
+
+	let clase;
+
+	$('#conversacion').empty();
     console.log("si entro ala funcion")
 	$.ajax({
-        url:`http://localhost:8081/usuarios/${id}/conversaciones`,
+        url:`http://localhost:8888/usuarios/${id}/conversaciones`,
         method:"GET",
         dataType:"json",
         data:{},
-
         success:(res)=>{
 			console.log(res);
-			
+			for (let i = 0; i < res.length; i++) {
+				if(res[i].horaUltimoMensaje && res[i].nombreDestinatario && res[i].ultimoMensaje){
+					if(res[i]._id == usuarioLogueado._id){
+						clase = 'replies'			
+					}else{
+						clase = 'sent'
+					}
+					$('#conversacion').append(`
+						<li class="${clase}">
+							<img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
+							<p>${res[i].ultimoMensaje}<small>${res[i].horaUltimoMensaje}</small></p>
+						</li>
+					`);
+				}else{
+
+				}	
+			}
         },
         error:(error)=>{
             console.error(error);
@@ -91,7 +132,7 @@ function CrearConversacion(id) {
 console.log("holaaa ", usuarioLogueado._id)
 $.ajax({
 	
-	url:'http://localhost:8081/chats',
+	url:'http://localhost:8888/chats',
 	method:"POST",
 	dataType:"json",
 	data:
