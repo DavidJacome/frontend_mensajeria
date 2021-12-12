@@ -6,7 +6,7 @@ function IniciarSesion(){
     var contrasena = document.getElementById('contrasena').value;
     console.log("me estas presioando")
     $.ajax({
-        url:'http://localhost:8888/usuarios/login',
+        url:'http://localhost:8081/usuarios/login',
         method:"POST",
         dataType:"json",
         data:
@@ -28,8 +28,9 @@ function IniciarSesion(){
                 localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
             }
             //window.location.href = '../chat2.html';
-
+        
         },
+        
         error:(error)=>{
             console.error("este esun error", error);
         }
@@ -48,7 +49,7 @@ function RegistrarUsuario(){
      
     if(contrasena==confirmarContrasena){
         $.ajax({
-            url:'http://localhost:8888/usuarios/registro',
+            url:'http://localhost:8081/usuarios/registro',
             method:"POST",
             dataType:"json",
             data:

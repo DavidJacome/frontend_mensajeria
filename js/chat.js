@@ -16,7 +16,7 @@ var usuariosContactos;
     for (let i = 0; i < conversaciones.length; i++) {
 	$("#conversaciones").append(
 			`<li class="contact">
-				<div class="wrap">
+				<div onclick ="MostrarConversaciones('${conversaciones[i]._id}');" class="wrap">
 					<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
 					<div class="meta">
 						<p class="name">${conversaciones[i].nombreDestinatario}</p>
@@ -40,7 +40,7 @@ var usuariosContactos;
 for (let j = 0; j < contactos.length; j++) {
 	console.log("este es inidce", contactos[j])
 	$.ajax({
-        url:`http://localhost:8888/usuarios/${contactos[j]}`,
+        url:`http://localhost:8081/usuarios/${contactos[j]}`,
         method:"GET",
         dataType:"json",
         data:{},
@@ -49,7 +49,7 @@ for (let j = 0; j < contactos.length; j++) {
 			console.log(res);
 			$("#nuevoMensaje").append(
 				`<li class="contact">
-				<div class="wrap">
+				<div onclick="CrearConversacion('${contactos[j]}');" class="wrap">
 					<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
 					<div class="meta">
 						<p class="name">${res.nombre}</p>
@@ -68,8 +68,49 @@ for (let j = 0; j < contactos.length; j++) {
 	
 })();
 
+function MostrarConversaciones(id) {
+    console.log("si entro ala funcion")
+	$.ajax({
+        url:`http://localhost:8081/usuarios/${id}/conversaciones`,
+        method:"GET",
+        dataType:"json",
+        data:{},
 
+        success:(res)=>{
+			console.log(res);
+			
+        },
+        error:(error)=>{
+            console.error(error);
+        }
+    });
+	
+};
 
+function CrearConversacion(id) {
+console.log("holaaa ", usuarioLogueado._id)
+$.ajax({
+	
+	url:'http://localhost:8081/chats',
+	method:"POST",
+	dataType:"json",
+	data:
+	{
+		idUsuario:usuarioLogueado._id,
+		idUsuarioReceptor:id,
+		},
+	success:(res)=>{
+		
+		console.log("esta es mi data ", res);
+	 
+	},
+	error:(error)=>{
+		console.error("este esun error", error);
+	}
+})
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(".messages").animate({ scrollTop: $(document).height() }, "fast");
 
