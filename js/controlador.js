@@ -18,7 +18,7 @@ function IniciarSesion(){
         success:(res)=>{
             usuarioLogueado= res,
             console.log("esta es mi data ", usuarioLogueado);
-            window.location.href = '../chat2.html';
+            window.location.href = 'chat2.html';
             if (localStorage.getItem('usuario')!=null) {
                 usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
                 //usuarioLogueado.push(agregarProducto);
@@ -27,12 +27,12 @@ function IniciarSesion(){
                 
                 localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
             }
-            //window.location.href = '../chat2.html';
+            //window.location.href = '/chat2.html';
         
         },
         
         error:(error)=>{
-            console.error("este esun error", error);
+            console.error("este es un error", error);
         }
     })
 }
@@ -80,6 +80,3 @@ function RegistrarUsuario(){
     }
     
 }
-
-
-

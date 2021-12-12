@@ -22,7 +22,7 @@ var imagenes = [
 
 (()=>{
 	usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
-	console.log(usuarioLogueado);
+	//console.log(usuarioLogueado);
 	contactos=usuarioLogueado.contactos;
 	conversaciones=usuarioLogueado.conversaciones;
 	$("#profile").append(
@@ -32,6 +32,7 @@ var imagenes = [
     </div>`
 	);
     for (let i = 0; i < conversaciones.length; i++) {
+	console.log(conversaciones[i]);
 	$("#conversaciones").append(
 			`<li class="contact">
 				<div onclick ="MostrarConversaciones('${conversaciones[i]._id}');" class="wrap">
@@ -56,7 +57,7 @@ var imagenes = [
 `)
 
 for (let j = 0; j < contactos.length; j++) {
-	console.log("este es inidce", contactos[j])
+	//console.log("este es inidce", contactos[j])
 	$.ajax({
         url:`http://localhost:8888/usuarios/${contactos[j]}`,
         method:"GET",
@@ -64,7 +65,7 @@ for (let j = 0; j < contactos.length; j++) {
         data:{},
             
         success:(res)=>{
-			console.log(res);
+			//console.log(res);
 			$("#nuevoMensaje").append(
 				`<li class="contact">
 				<div onclick="CrearConversacion('${contactos[j]}');" class="wrap">
@@ -90,8 +91,9 @@ function cerrarSesion(){
 	localStorage.clear();
 }
 
+var usuarioReceptor;
 function MostrarConversaciones(id) {
-
+	usuarioReceptor = id;
 	let clase;
 
 	$('#conversacion').empty();
@@ -129,26 +131,29 @@ function MostrarConversaciones(id) {
 };
 
 function CrearConversacion(id) {
-console.log("holaaa ", usuarioLogueado._id)
-$.ajax({
-	
-	url:'http://localhost:8888/chats',
-	method:"POST",
-	dataType:"json",
-	data:
-	{
-		idUsuario:usuarioLogueado._id,
-		idUsuarioReceptor:id,
-		},
-	success:(res)=>{
+	console.log(id)
+	console.log("holaaa ", usuarioLogueado._id);
+	$.ajax({
 		
-		console.log("esta es mi data ", res);
-	 
-	},
-	error:(error)=>{
-		console.error("este esun error", error);
-	}
-})
+		url:'http://localhost:8888/chats',
+		method:"POST",
+		dataType:"json",
+		data:
+		{
+			idUsuario:usuarioLogueado._id,
+			idUsuarioReceptor:id,
+			nombreDestinatario: "Jacome",
+    		imagenDestinatario: ""
+		},
+		success:(res)=>{
+			
+			console.log("esta es mi data ", res);
+		
+		},
+		error:(error)=>{
+			console.error("este esun error", error);
+		}
+	});
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,6 +192,7 @@ $("#status-options ul li").click(function() {
 	$("#status-options").removeClass("active");
 });
 
+let mensajes = [];
 function newMessage() {
 	message = $(".message-input input").val();
 	if($.trim(message) == '') {
@@ -196,6 +202,40 @@ function newMessage() {
 	$('.message-input input').val(null);
 	$('.contact.active .preview').html('<span>You: </span>' + message);
 	$(".messages").animate({ scrollTop: $(document).height() }, "fast");
+
+	let horaS = new Date();
+	console.log("se esta enviando el mensaje");
+	//console.log(usuarioReceptor);
+	$.ajax({
+		url:`http://localhost:8888/chats/'${id}'/mensajes`,
+		method:"POST",
+		dataType:"json",
+		data:
+		{
+			emisor: {
+				_id: usuarioLogueado._id,
+				nombre:usuarioLogueado.nombre,
+				imagen: usuarioLogueado.imagen
+			},
+			receptor: {
+				_id: usuarioReceptor,
+				nombre: "",
+				imagen: ""
+			},
+			ultimoMensaje: "",
+			fechaConversacion: horaS.toLocaleTimeString(),
+			mensajes: mensajes.push({
+				contenido: message,
+				hora: horaS.toLocaleTimeString()
+			})
+		},
+		success:(res)=>{
+			console.log("esta es mi data ", res);
+		},
+		error:(error)=>{
+			console.error("este es un error", error);
+		}
+	});
 };
 
 $('.submit').click(function() {
@@ -208,5 +248,3 @@ $(window).on('keydown', function(e) {
     return false;
   }
 });
-
-
