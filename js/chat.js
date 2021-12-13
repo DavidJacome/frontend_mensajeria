@@ -29,6 +29,7 @@ var imagenes = [
 		data: {},
 		success: (res) => {
 			usuarioLogueado = res
+			console.log(usuarioLogueado);
 			generarInformacion();
 		},
 		error: (error) => {
@@ -92,6 +93,7 @@ function generarInformacion() {
 
 			},
 			error: (error) => {
+				console.log(contactos[j]);
 				console.error(error);
 			}
 		});
@@ -403,3 +405,48 @@ function generarMensajes(id){
 		}
 	});
 }
+
+function verificar() {
+	let numeroContacto = document.getElementById("numeroContacto").value;
+	console.log(numeroContacto);
+	let idContacto;
+	$.ajax({
+		url: `http://localhost:8888/usuarios/numeroTelefono`,
+		method: "post",
+		dataType: "json",
+		data: {
+			numeroTelefono:numeroContacto
+		},
+		success: (res) => {
+			idContacto = res;
+			console.log(idContacto);
+			console.log(usuarioLogueado);
+			$.ajax({
+				url: `http://localhost:8888/usuarios/${usuarioLogueado._id}/contactos`,
+				method: "POST",
+				dataType: "json",
+				data:
+				{
+					idContacto: idContacto._id,
+				},
+				success: (res) => {
+					console.log("Segunda peticion: ", res);
+					location.reload()
+					$(function () {
+						$('#modal-contacto').modal('toggle');
+					});
+
+				},
+				error: (error) => {
+
+					console.error("este es un error", error);
+				}
+			});
+			console.log("Verificando");
+		},
+		error: (error) => {
+			console.error("este es un error", error);
+		}
+	});
+}
+
