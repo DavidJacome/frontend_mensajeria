@@ -39,7 +39,7 @@ function validarLogin(){
      
         
         
-        if(nombre===""||telefono===""|| contraseña===""){
+        if(nombre===""||telefono===""|| contrasena===""){
         alert("Todos los campos son obligatorios");
         return false;
         }

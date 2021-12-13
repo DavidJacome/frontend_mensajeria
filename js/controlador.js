@@ -43,26 +43,21 @@ function RegistrarUsuario(){
     var contrasena = document.getElementById('contrasena').value;
     var confirmarContrasena = document.getElementById('confirmarContrasena').value;
     var terminos=document.getElementById("terminos").value;
-     
+    var data = {
+        nombre:nombre,
+        telefono:telefono,
+        contrasena:contrasena
+    }
     if(contrasena==confirmarContrasena){
         $.ajax({
             url:'http://localhost:8888/usuarios/registro',
             method:"POST",
             dataType:"json",
-            data:
-            {
-                nombre:nombre,
-                foto:'https://jarroba.com/foro/?qa=image&qa_blobid=11099619010778415938&qa_size=200',
-                estado:"disponible",
-                telefono: telefono,
-                contrasena:contrasena,
-                contactos: [],
-                conversaciones: []
-            },
+            data: data,
             success:(res)=>{
                 console.log("esta es mi data ", res);
                 alert("Se registro Exitosamente, puedes iniciar sesion YA!  Bienvenido")
-                window.location.href = '../login.html';
+                window.location = 'login.html';
             },
             error:(error)=>{
                 console.error("este esun error", error);
