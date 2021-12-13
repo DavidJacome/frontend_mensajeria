@@ -57,7 +57,7 @@ function RegistrarUsuario(){
             success:(res)=>{
                 console.log("esta es mi data ", res);
                 alert("Se registro Exitosamente, puedes iniciar sesion YA!  Bienvenido")
-                window.location = 'login.html';
+                window.location = 'index.html';
             },
             error:(error)=>{
                 console.error("este esun error", error);
