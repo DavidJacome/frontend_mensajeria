@@ -105,7 +105,6 @@ function cerrarSesion() {
 
 
 function MostrarConversaciones(id) {
-	let clase;
 	let usuarioActivo;
 	$('#conversacion').empty();
 	console.log("si entro ala funcion")
@@ -116,13 +115,13 @@ function MostrarConversaciones(id) {
 		data: {},
 		success: (res) => {
 
-
+			generarMensajes(id);
 			console.log(res);
 			if (usuarioLogueado._id == res.emisor._id) {
 				usuarioActivo = true;
 				document.getElementById('perfilContacto').innerHTML = '';
 				document.getElementById('perfilContacto').innerHTML = `
-				<img src="${res.receptor.foto}" alt="" />
+				<img src="${res.receptor.imagen}" alt="" />
 				<p>${res.receptor.nombre}</p>
 				`;
 				document.getElementById('botonEnviar').innerHTML = '';
@@ -130,7 +129,7 @@ function MostrarConversaciones(id) {
 				<div class="wrap">
 				<input type="text" placeholder="Write your message..." />
 				<i class="fa fa-paperclip attachment" aria-hidden="true"></i>
-				<button class="submit" onclick="enviarMensaje('${id}','${res.receptor._id}','${res.receptor.nombre}','${res.receptor.foto}');"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+				<button class="submit" onclick="enviarMensaje('${id}','${res.receptor._id}','${res.receptor.nombre}','${res.receptor.imagen}');"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
 				</div>
 				`;
 				console.log(res.receptor);
@@ -217,9 +216,11 @@ function CrearConversacion(id) {
 					success: (res) => {
 						for (let i = 0; i < res.length; i++){
 							if(id == res[i].receptor._id || id == res[i].emisor._id){
-								console.log("no se crea")
-								crear = false;
-								break;
+								if(usuarioLogueado._id == res[i].receptor._id || usuarioLogueado._id == res[i].emisor._id){
+									console.log("no se crea")
+									crear = false;
+									break;
+								}
 							}
 						}
 						if(crear){
@@ -366,24 +367,26 @@ $(window).on('keydown', function (e) {
 	}
 });
 
-/*$.ajax({
-		url:`http://localhost:8888/usuarios/${id}/conversaciones`,
+function generarMensajes(id){
+	let clase;
+	$.ajax({
+		url:`http://localhost:8888/chats/${id}`,
 		method:"GET",
 		dataType:"json",
 		data:{},
 		success:(res)=>{
 			console.log(res);
-			for (let i = 0; i < res.length; i++) {
-				if(res[i].horaUltimoMensaje && res[i].nombreDestinatario && res[i].ultimoMensaje){
-					if(res[i]._id == usuarioLogueado._id){
-						clase = 'replies'			
+			for (let i = 0; i < res.mensajes.length; i++) {
+				if(res.mensajes[i].hora && res.mensajes[i].receptor.nombre && res.ultimoMensaje){
+					if(res.mensajes[i].emisor._id == usuarioLogueado._id){
+						clase = 'replies';
 					}else{
-						clase = 'sent'
+						clase = 'sent';
 					}
 					$('#conversacion').append(`
 						<li class="${clase}">
-							<img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
-							<p>${res[i].ultimoMensaje}<small>${res[i].horaUltimoMensaje}</small></p>
+							<img src="${res.mensajes[i].emisor.imagen}" alt="" />
+							<p>${res.mensajes[i].contenido}&nbsp<small>${res.mensajes[i].hora}</small></p>
 						</li>
 					`);
 				}else{
@@ -394,4 +397,5 @@ $(window).on('keydown', function (e) {
 		error:(error)=>{
 			console.error(error);
 		}
-	});*/
+	});
+}
