@@ -23,7 +23,7 @@ var imagenes = [
 (() => {
 	datos = JSON.parse(localStorage.getItem('usuario'));
 	$.ajax({
-		url: `http://localhost:8888/usuarios/${datos._id}`,
+		url: `https://vast-everglades-01207.herokuapp.com/usuarios/${datos._id}`,
 		method: "GET",
 		dataType: "json",
 		data: {},
@@ -75,7 +75,7 @@ function generarInformacion() {
 	document.getElementById('nuevoMensaje').innerHTML = '';
 	for (let j = 0; j < contactos.length; j++) {
 		$.ajax({
-			url: `http://localhost:8888/usuarios/${contactos[j]}`,
+			url: `https://vast-everglades-01207.herokuapp.com/usuarios/${contactos[j]}`,
 			method: "GET",
 			dataType: "json",
 			data: {},
@@ -111,7 +111,7 @@ function MostrarConversaciones(id) {
 	$('#conversacion').empty();
 	console.log("si entro ala funcion")
 	$.ajax({
-		url: `http://localhost:8888/chats/${id}`,
+		url: `https://vast-everglades-01207.herokuapp.com/chats/${id}`,
 		method: "GET",
 		dataType: "json",
 		data: {},
@@ -166,7 +166,7 @@ function CrearConversacion(id) {
 	var usuarioConversacion;
 	let crear = true;
 	$.ajax({
-		url: `http://localhost:8888/usuarios/${id}`,
+		url: `https://vast-everglades-01207.herokuapp.com/usuarios/${id}`,
 		method: "GET",
 		dataType: "json",
 		data: {},
@@ -174,7 +174,7 @@ function CrearConversacion(id) {
 			usuarioConversacion = res;
 			if(conversaciones.length == 0){
 				$.ajax({
-					url: 'http://localhost:8888/chats',
+					url: 'https://vast-everglades-01207.herokuapp.com/chats',
 					method: "POST",
 					dataType: "json",
 					data:
@@ -211,7 +211,7 @@ function CrearConversacion(id) {
 				});
 			}else{
 				$.ajax({
-					url: `http://localhost:8888/chats/`,
+					url: `https://vast-everglades-01207.herokuapp.com/chats/`,
 					method: "GET",
 					dataType: "json",
 					data: {},
@@ -230,7 +230,7 @@ function CrearConversacion(id) {
 						}
 						if(crear){
 							$.ajax({
-								url: 'http://localhost:8888/chats',
+								url: 'https://vast-everglades-01207.herokuapp.com/chats',
 								method: "POST",
 								dataType: "json",
 								data:
@@ -326,7 +326,7 @@ function enviarMensaje(id, idReceptor, nombreReceptor, fotoReceptor) {
 	let horaS = new Date();
 	console.log(fotoReceptor);
 	$.ajax({
-		url: `http://localhost:8888/chats/${id}/mensajes`,
+		url: `https://vast-everglades-01207.herokuapp.com/chats/${id}/mensajes`,
 		method: "POST",
 		dataType: "json",
 		data:
@@ -375,7 +375,7 @@ $(window).on('keydown', function (e) {
 function generarMensajes(id){
 	let clase;
 	$.ajax({
-		url:`http://localhost:8888/chats/${id}`,
+		url:`https://vast-everglades-01207.herokuapp.com/chats/${id}`,
 		method:"GET",
 		dataType:"json",
 		data:{},
@@ -411,7 +411,7 @@ function verificar() {
 	console.log(numeroContacto);
 	let idContacto;
 	$.ajax({
-		url: `http://localhost:8888/usuarios/numeroTelefono`,
+		url: `https://vast-everglades-01207.herokuapp.com/usuarios/numeroTelefono`,
 		method: "post",
 		dataType: "json",
 		data: {
@@ -422,7 +422,7 @@ function verificar() {
 			console.log(idContacto);
 			console.log(usuarioLogueado);
 			$.ajax({
-				url: `http://localhost:8888/usuarios/${usuarioLogueado._id}/contactos`,
+				url: `https://vast-everglades-01207.herokuapp.com/usuarios/${usuarioLogueado._id}/contactos`,
 				method: "POST",
 				dataType: "json",
 				data:
@@ -453,7 +453,7 @@ function verificar() {
 function buscarConversacion(){
 	busqueda = document.getElementById('busquedaConversacion').value;
 	$.ajax({
-		url:`http://localhost:8888/usuarios/${usuarioLogueado._id}/conversaciones/${busqueda}`,
+		url:`https://vast-everglades-01207.herokuapp.com/usuarios/${usuarioLogueado._id}/conversaciones/${busqueda}`,
 		method:"GET",
 		dataType:"json",
 		data:{},

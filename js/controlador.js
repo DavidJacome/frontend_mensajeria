@@ -5,7 +5,7 @@ function IniciarSesion(){
     var telefono = document.getElementById('telefono').value;
     var contrasena = document.getElementById('contrasena').value;
     $.ajax({
-        url:'http://localhost:8888/usuarios/login',
+        url:'https://vast-everglades-01207.herokuapp.com/usuarios/login',
         method:"POST",
         dataType:"json",
         data:
