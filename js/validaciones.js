@@ -23,7 +23,6 @@ function validarLogin(){
         return false
     }
     else {
-        alert("Datos Correctos");
         IniciarSesion();
         return true
     }
@@ -63,7 +62,6 @@ function validarLogin(){
             return false
         }
         else {
-            alert("Datos Correctos");
             RegistrarUsuario();
             return true
         }

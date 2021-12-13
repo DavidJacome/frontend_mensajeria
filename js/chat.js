@@ -21,22 +21,27 @@ var imagenes = [
 ];
 
 (()=>{
+	generarInformacion();
+})();
+
+function generarInformacion(){
+	
 	usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
-	//console.log(usuarioLogueado);
 	contactos=usuarioLogueado.contactos;
 	conversaciones=usuarioLogueado.conversaciones;
+	document.getElementById('profile').innerHTML = ''; 
 	$("#profile").append(
 		`<div class="wrap">
-	<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
+	<img id="profile-img" src="${usuarioLogueado.foto}" class="online" alt="" />
 	<p>${usuarioLogueado.nombre}</p>
     </div>`
 	);
+	document.getElementById('conversaciones').innerHTML = ''; 
     for (let i = 0; i < conversaciones.length; i++) {
-	console.log(conversaciones[i]);
 	$("#conversaciones").append(
 			`<li class="contact">
 				<div onclick ="MostrarConversaciones('${conversaciones[i]._id}');" class="wrap">
-					<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+					<img src="${conversaciones[i].imagenDestinatario}" alt="" />
 					<div class="meta">
 						<p class="name">${conversaciones[i].nombreDestinatario}</p>
 						<p class="preview">${conversaciones[i].ultimoMensaje}</p>
@@ -45,7 +50,7 @@ var imagenes = [
 				</div>
 			</li>`)
 		}
-
+	document.getElementById('ajusteUsuario').innerHTML = '';
 	$("#ajusteUsuario").append(`
 	<div   style="margin-bottom: 10px;">
 		<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="mr-auto ml-auto" alt="" />
@@ -55,7 +60,7 @@ var imagenes = [
 	<button type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal-change-password">Cambiar Contraseña</button>
 	<a type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</a>
 `)
-
+document.getElementById('nuevoMensaje').innerHTML = '';
 for (let j = 0; j < contactos.length; j++) {
 	//console.log("este es inidce", contactos[j])
 	$.ajax({
@@ -66,6 +71,7 @@ for (let j = 0; j < contactos.length; j++) {
             
         success:(res)=>{
 			//console.log(res);
+			
 			$("#nuevoMensaje").append(
 				`<li class="contact">
 				<div onclick="CrearConversacion('${contactos[j]}');" class="wrap">
@@ -81,24 +87,71 @@ for (let j = 0; j < contactos.length; j++) {
             console.error(error);
         }
     });
-	
 }
-
-})();
+};
 
 function cerrarSesion(){
-	window.location.href = '../login.html';
+	window.location = 'login.html';
 	localStorage.clear();
 }
 
-var usuarioReceptor;
-function MostrarConversaciones(id) {
-	usuarioReceptor = id;
-	let clase;
 
+function MostrarConversaciones(id) {
+	let clase;
+	let usuarioActivo;
 	$('#conversacion').empty();
     console.log("si entro ala funcion")
 	$.ajax({
+        url:`http://localhost:8888/chats/${id}`,
+        method:"GET",
+        dataType:"json",
+        data:{},
+        success:(res)=>{
+			console.log(res);
+			if (usuarioLogueado._id == res.emisor._id){
+				usuarioActivo = true;
+				document.getElementById('perfilContacto').innerHTML = '';
+				document.getElementById('perfilContacto').innerHTML = `
+				<img src="${res.receptor.foto}" alt="" />
+				<p>${res.receptor.nombre}</p>
+				`;
+				document.getElementById('botonEnviar').innerHTML = '';
+				document.getElementById('botonEnviar').innerHTML = `
+				<div class="wrap">
+				<input type="text" placeholder="Write your message..." />
+				<i class="fa fa-paperclip attachment" aria-hidden="true"></i>
+				<button class="submit" onclick="enviarMensaje('${id}','${res.receptor._id}','${res.receptor.nombre}','${res.receptor.foto}');"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+				</div>
+				`;
+				console.log(res.receptor);
+			}else if(usuarioLogueado._id == res.receptor._id){
+				console.log(res.emisor);
+				usuarioActivo = false;
+				document.getElementById('perfilContacto').innerHTML = '';
+				document.getElementById('perfilContacto').innerHTML = `
+				<img src="${res.emisor.imagen}" alt="" />
+				<p>${res.emisor.nombre}</p>`;
+				document.getElementById('botonEnviar').innerHTML = '';
+				document.getElementById('botonEnviar').innerHTML = `
+				<div class="wrap">
+				<input type="text" placeholder="Write your message..." />
+				<i class="fa fa-paperclip attachment" aria-hidden="true"></i>
+				<button class="submit" onclick="enviarMensaje('${id}','${res.emisor._id}','${res.emisor.nombre}','${res.emisor.imagen}');"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+				</div>
+				`;
+			}else {
+				return "BQTP";
+			};
+
+
+
+
+        },
+        error:(error)=>{
+            console.error(error);
+        }
+    });
+	/*$.ajax({
         url:`http://localhost:8888/usuarios/${id}/conversaciones`,
         method:"GET",
         dataType:"json",
@@ -126,34 +179,66 @@ function MostrarConversaciones(id) {
         error:(error)=>{
             console.error(error);
         }
-    });
+    });*/
 	
 };
 
 function CrearConversacion(id) {
-	console.log(id)
-	console.log("holaaa ", usuarioLogueado._id);
+	let horaS = new Date();
+	var usuarioConversacion;
 	$.ajax({
+        url:`http://localhost:8888/usuarios/${id}`,
+        method:"GET",
+        dataType:"json",
+        data:{},
+
+        success:(res)=>{
+			usuarioConversacion = res;
+			$.ajax({
 		
-		url:'http://localhost:8888/chats',
-		method:"POST",
-		dataType:"json",
-		data:
-		{
-			idUsuario:usuarioLogueado._id,
-			idUsuarioReceptor:id,
-			nombreDestinatario: "Jacome",
-    		imagenDestinatario: ""
-		},
-		success:(res)=>{
-			
-			console.log("esta es mi data ", res);
-		
-		},
-		error:(error)=>{
-			console.error("este esun error", error);
-		}
-	});
+				url:'http://localhost:8888/chats',
+				method:"POST",
+				dataType:"json",
+				data:
+				{
+					idUsuario:usuarioLogueado._id,
+					nombreEmisor: usuarioLogueado.nombre,
+					imagenEmisor: usuarioLogueado.foto,
+					idUsuarioReceptor:id,
+					nombreDestinatario: usuarioConversacion.nombre,
+					imagenDestinatario: usuarioConversacion.foto,
+					fechaConversacion :  horaS.toLocaleTimeString()
+				},
+				success:(res)=>{
+					data ={
+						horaUltimoMensaje: horaS.toLocaleTimeString(),
+						imagenDestinatario: usuarioConversacion.foto,
+						nombreDestinatario:usuarioConversacion.nombre,
+						ultimoMensaje: "",
+						_id: res.chat._id
+					}
+					/*usuarios.ordenes.push(addProd);
+    				localStorage.setItem('usuarios', JSON.stringify(usuarios)); */
+					usuarioLogueado.conversaciones.push(data);
+					localStorage.setItem('usuario', JSON.stringify(usuarioLogueado)); 
+					generarInformacion();
+					$(function () {
+						$('#modal-newmessage').modal('toggle');
+					 });
+					console.log("esta es mi data ", res);
+				
+				},
+				error:(error)=>{
+					console.error("este esun error", error);
+				}
+			});
+        },
+        error:(error)=>{
+            console.error(error);
+        }
+    });
+	
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,21 +278,15 @@ $("#status-options ul li").click(function() {
 });
 
 let mensajes = [];
-function newMessage() {
+function enviarMensaje(id,idReceptor,nombreReceptor,fotoReceptor) {
 	message = $(".message-input input").val();
 	if($.trim(message) == '') {
 		return false;
 	}
-	$('<li class="sent"><img src="http://emilcarlsson.se/assets/mikeross.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
-	$('.message-input input').val(null);
-	$('.contact.active .preview').html('<span>You: </span>' + message);
-	$(".messages").animate({ scrollTop: $(document).height() }, "fast");
-
 	let horaS = new Date();
-	console.log("se esta enviando el mensaje");
-	//console.log(usuarioReceptor);
+	console.log(fotoReceptor);
 	$.ajax({
-		url:`http://localhost:8888/chats/'${id}'/mensajes`,
+		url:`http://localhost:8888/chats/${id}/mensajes`,
 		method:"POST",
 		dataType:"json",
 		data:
@@ -215,22 +294,26 @@ function newMessage() {
 			emisor: {
 				_id: usuarioLogueado._id,
 				nombre:usuarioLogueado.nombre,
-				imagen: usuarioLogueado.imagen
+				imagen: usuarioLogueado.foto
 			},
 			receptor: {
-				_id: usuarioReceptor,
-				nombre: "",
-				imagen: ""
+				_id: idReceptor,
+				nombre: nombreReceptor,
+				imagen: fotoReceptor
 			},
-			ultimoMensaje: "",
+			ultimoMensaje: message,
 			fechaConversacion: horaS.toLocaleTimeString(),
-			mensajes: mensajes.push({
+			mensajes: [{
 				contenido: message,
 				hora: horaS.toLocaleTimeString()
-			})
+			}]
 		},
 		success:(res)=>{
 			console.log("esta es mi data ", res);
+			$('<li class="sent"><img src="http://emilcarlsson.se/assets/mikeross.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+			$('.message-input input').val(null);
+			$('.contact.active .preview').html('<span>You: </span>' + message);
+			$(".messages").animate({ scrollTop: $(document).height() }, "fast");
 		},
 		error:(error)=>{
 			console.error("este es un error", error);
@@ -238,13 +321,13 @@ function newMessage() {
 	});
 };
 
-$('.submit').click(function() {
-  newMessage();
-});
+/*$('.submit').click(function() {
+  enviarMensaje();
+});*/
 
 $(window).on('keydown', function(e) {
   if (e.which == 13) {
-    newMessage();
+    enviarMensaje();
     return false;
   }
 });

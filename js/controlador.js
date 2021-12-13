@@ -4,7 +4,6 @@ var usuarioLogueado;
 function IniciarSesion(){
     var telefono = document.getElementById('telefono').value;
     var contrasena = document.getElementById('contrasena').value;
-    console.log("me estas presionando")
     $.ajax({
         url:'http://localhost:8888/usuarios/login',
         method:"POST",
@@ -18,7 +17,7 @@ function IniciarSesion(){
         success:(res)=>{
             usuarioLogueado= res,
             console.log("esta es mi data ", usuarioLogueado);
-            window.location.href = 'chat2.html';
+            window.location = 'chat2.html';
             if (localStorage.getItem('usuario')!=null) {
                 usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
                 //usuarioLogueado.push(agregarProducto);
@@ -27,8 +26,6 @@ function IniciarSesion(){
                 
                 localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
             }
-            //window.location.href = '/chat2.html';
-        
         },
         
         error:(error)=>{
@@ -61,12 +58,8 @@ function RegistrarUsuario(){
                 contrasena:contrasena,
                 contactos: [],
                 conversaciones: []
-       
             },
-              
             success:(res)=>{
-                
-              
                 console.log("esta es mi data ", res);
                 alert("Se registro Exitosamente, puedes iniciar sesion YA!  Bienvenido")
                 window.location.href = '../login.html';
