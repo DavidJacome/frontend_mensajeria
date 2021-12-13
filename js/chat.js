@@ -1,6 +1,6 @@
 var usuarioLogueado;
-var contactos=[];
-var conversaciones=[];
+var contactos = [];
+var conversaciones = [];
 var usuariosContactos;
 
 var imagenes = [
@@ -20,25 +20,36 @@ var imagenes = [
 	'https://res.cloudinary.com/dalarapp2021/image/upload/v1639208859/Mensajeria/Usuarios/nlq1dzsn4bs0c6dtdoj0.png'
 ];
 
-(()=>{
-	generarInformacion();
+(() => {
+	datos = JSON.parse(localStorage.getItem('usuario'));
+	$.ajax({
+		url: `http://localhost:8888/usuarios/${datos._id}`,
+		method: "GET",
+		dataType: "json",
+		data: {},
+		success: (res) => {
+			usuarioLogueado = res
+			generarInformacion();
+		},
+		error: (error) => {
+			console.error(error);
+		}
+	});
 })();
 
-function generarInformacion(){
-	
-	usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
-	contactos=usuarioLogueado.contactos;
-	conversaciones=usuarioLogueado.conversaciones;
-	document.getElementById('profile').innerHTML = ''; 
+function generarInformacion() {
+	contactos = usuarioLogueado.contactos;
+	conversaciones = usuarioLogueado.conversaciones;
+	document.getElementById('profile').innerHTML = '';
 	$("#profile").append(
 		`<div class="wrap">
 	<img id="profile-img" src="${usuarioLogueado.foto}" class="online" alt="" />
 	<p>${usuarioLogueado.nombre}</p>
     </div>`
 	);
-	document.getElementById('conversaciones').innerHTML = ''; 
-    for (let i = 0; i < conversaciones.length; i++) {
-	$("#conversaciones").append(
+	document.getElementById('conversaciones').innerHTML = '';
+	for (let i = 0; i < conversaciones.length; i++) {
+		$("#conversaciones").append(
 			`<li class="contact">
 				<div onclick ="MostrarConversaciones('${conversaciones[i]._id}');" class="wrap">
 					<img src="${conversaciones[i].imagenDestinatario}" alt="" />
@@ -49,48 +60,45 @@ function generarInformacion(){
 					</div>
 				</div>
 			</li>`)
-		}
+	}
 	document.getElementById('ajusteUsuario').innerHTML = '';
 	$("#ajusteUsuario").append(`
 	<div   style="margin-bottom: 10px;">
-		<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="mr-auto ml-auto" alt="" />
+		<img id="profile-img" src="${usuarioLogueado.foto}" class="mr-auto ml-auto" alt="" />
 		<p style="display: block; text-align: center; margin-top: 5px;">${usuarioLogueado.nombre} <a href="#" class="fa fa-pencil fa-fw"></a></p>
 	</div>
 	<input  style="margin-bottom: 10px;" type="text" class="form-control" placeholder="Estado" value ="${usuarioLogueado.estado}">
 	<button type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal-change-password">Cambiar Contraseña</button>
 	<a type="button" style="width: 100%; margin-bottom: 10px;" class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</a>
 `)
-document.getElementById('nuevoMensaje').innerHTML = '';
-for (let j = 0; j < contactos.length; j++) {
-	//console.log("este es inidce", contactos[j])
-	$.ajax({
-        url:`http://localhost:8888/usuarios/${contactos[j]}`,
-        method:"GET",
-        dataType:"json",
-        data:{},
-            
-        success:(res)=>{
-			//console.log(res);
-			
-			$("#nuevoMensaje").append(
-				`<li class="contact">
+	document.getElementById('nuevoMensaje').innerHTML = '';
+	for (let j = 0; j < contactos.length; j++) {
+		$.ajax({
+			url: `http://localhost:8888/usuarios/${contactos[j]}`,
+			method: "GET",
+			dataType: "json",
+			data: {},
+
+			success: (res) => {
+				$("#nuevoMensaje").append(
+					`<li class="contact">
 				<div onclick="CrearConversacion('${contactos[j]}');" class="wrap">
-					<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+					<img src="${res.foto}" alt="" />
 					<div class="meta">
 						<p class="name">${res.nombre}</p>
 					</div>
 				</div>
 			</li>`)
-         
-        },
-        error:(error)=>{
-            console.error(error);
-        }
-    });
-}
+
+			},
+			error: (error) => {
+				console.error(error);
+			}
+		});
+	}
 };
 
-function cerrarSesion(){
+function cerrarSesion() {
 	window.location = 'login.html';
 	localStorage.clear();
 }
@@ -100,15 +108,17 @@ function MostrarConversaciones(id) {
 	let clase;
 	let usuarioActivo;
 	$('#conversacion').empty();
-    console.log("si entro ala funcion")
+	console.log("si entro ala funcion")
 	$.ajax({
-        url:`http://localhost:8888/chats/${id}`,
-        method:"GET",
-        dataType:"json",
-        data:{},
-        success:(res)=>{
+		url: `http://localhost:8888/chats/${id}`,
+		method: "GET",
+		dataType: "json",
+		data: {},
+		success: (res) => {
+
+
 			console.log(res);
-			if (usuarioLogueado._id == res.emisor._id){
+			if (usuarioLogueado._id == res.emisor._id) {
 				usuarioActivo = true;
 				document.getElementById('perfilContacto').innerHTML = '';
 				document.getElementById('perfilContacto').innerHTML = `
@@ -124,7 +134,7 @@ function MostrarConversaciones(id) {
 				</div>
 				`;
 				console.log(res.receptor);
-			}else if(usuarioLogueado._id == res.receptor._id){
+			} else if (usuarioLogueado._id == res.receptor._id) {
 				console.log(res.emisor);
 				usuarioActivo = false;
 				document.getElementById('perfilContacto').innerHTML = '';
@@ -139,24 +149,229 @@ function MostrarConversaciones(id) {
 				<button class="submit" onclick="enviarMensaje('${id}','${res.emisor._id}','${res.emisor.nombre}','${res.emisor.imagen}');"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
 				</div>
 				`;
-			}else {
+			} else {
 				return "BQTP";
 			};
 
+		},
+		error: (error) => {
+			console.error(error);
+		}
+	});
+};
 
+function CrearConversacion(id) {
+	let horaS = new Date();
+	var usuarioConversacion;
+	let crear = true;
+	$.ajax({
+		url: `http://localhost:8888/usuarios/${id}`,
+		method: "GET",
+		dataType: "json",
+		data: {},
+		success: (res) => {
+			usuarioConversacion = res;
+			if(conversaciones.length == 0){
+				$.ajax({
+					url: 'http://localhost:8888/chats',
+					method: "POST",
+					dataType: "json",
+					data:
+					{
+						idUsuario: usuarioLogueado._id,
+						nombreEmisor: usuarioLogueado.nombre,
+						imagenEmisor: usuarioLogueado.foto,
+						idUsuarioReceptor: id,
+						nombreDestinatario: usuarioConversacion.nombre,
+						imagenDestinatario: usuarioConversacion.foto,
+						fechaConversacion: horaS.toLocaleTimeString()
+					},
+					success: (res) => {
+						data = {
+							horaUltimoMensaje: horaS.toLocaleTimeString(),
+							imagenDestinatario: usuarioConversacion.foto,
+							nombreDestinatario: usuarioConversacion.nombre,
+							ultimoMensaje: "",
+							_id: res.chat._id
+						}
+						/*usuarios.ordenes.push(addProd);
+						localStorage.setItem('usuarios', JSON.stringify(usuarios)); */
+						usuarioLogueado.conversaciones.push(data);
+						localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
+						generarInformacion();
+						$(function () {
+							$('#modal-newmessage').modal('toggle');
+						});
+						console.log("esta es mi data ", res);
+					},
+					error: (error) => {
+						console.error("este es un error", error);
+					}
+				});
+			}else{
+				$.ajax({
+					url: `http://localhost:8888/chats/`,
+					method: "GET",
+					dataType: "json",
+					data: {},
+					success: (res) => {
+						for (let i = 0; i < res.length; i++){
+							if(id == res[i].receptor._id || id == res[i].emisor._id){
+								console.log("no se crea")
+								crear = false;
+								break;
+							}
+						}
+						if(crear){
+							$.ajax({
+								url: 'http://localhost:8888/chats',
+								method: "POST",
+								dataType: "json",
+								data:
+								{
+									idUsuario: usuarioLogueado._id,
+									nombreEmisor: usuarioLogueado.nombre,
+									imagenEmisor: usuarioLogueado.foto,
+									idUsuarioReceptor: id,
+									nombreDestinatario: usuarioConversacion.nombre,
+									imagenDestinatario: usuarioConversacion.foto,
+									fechaConversacion: horaS.toLocaleTimeString()
+								},
+								success: (res) => {
+									data = {
+										horaUltimoMensaje: horaS.toLocaleTimeString(),
+										imagenDestinatario: usuarioConversacion.foto,
+										nombreDestinatario: usuarioConversacion.nombre,
+										ultimoMensaje: "",
+										_id: res.chat._id
+									}
+									/*usuarios.ordenes.push(addProd);
+									localStorage.setItem('usuarios', JSON.stringify(usuarios)); */
+									usuarioLogueado.conversaciones.push(data);
+									localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
+									generarInformacion();
+									$(function () {
+										$('#modal-newmessage').modal('toggle');
+									});
+									console.log("esta es mi data ", res);
+								},
+								error: (error) => {
+									console.error("este es un error", error);
+								}
+							});
+						}
+					},
+					error: (error) => {
+						console.error(error);
+					}
+				});
+			}
+			
+		},
+		error: (error) => {
+			console.error(error);
+		}
+	});
 
+}
 
-        },
-        error:(error)=>{
-            console.error(error);
-        }
-    });
-	/*$.ajax({
-        url:`http://localhost:8888/usuarios/${id}/conversaciones`,
-        method:"GET",
-        dataType:"json",
-        data:{},
-        success:(res)=>{
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$(".messages").animate({ scrollTop: $(document).height() }, "fast");
+
+$("#profile-img").click(function () {
+	$("#status-options").toggleClass("active");
+});
+
+$(".expand-button").click(function () {
+	$("#profile").toggleClass("expanded");
+	$("#contacts").toggleClass("expanded");
+});
+
+$("#status-options ul li").click(function () {
+	$("#profile-img").removeClass();
+	$("#status-online").removeClass("active");
+	$("#status-away").removeClass("active");
+	$("#status-busy").removeClass("active");
+	$("#status-offline").removeClass("active");
+	$(this).addClass("active");
+
+	if ($("#status-online").hasClass("active")) {
+		$("#profile-img").addClass("online");
+	} else if ($("#status-away").hasClass("active")) {
+		$("#profile-img").addClass("away");
+	} else if ($("#status-busy").hasClass("active")) {
+		$("#profile-img").addClass("busy");
+	} else if ($("#status-offline").hasClass("active")) {
+		$("#profile-img").addClass("offline");
+	} else {
+		$("#profile-img").removeClass();
+	};
+
+	$("#status-options").removeClass("active");
+});
+
+let mensajes = [];
+function enviarMensaje(id, idReceptor, nombreReceptor, fotoReceptor) {
+	message = $(".message-input input").val();
+	if ($.trim(message) == '') {
+		return false;
+	}
+	let horaS = new Date();
+	console.log(fotoReceptor);
+	$.ajax({
+		url: `http://localhost:8888/chats/${id}/mensajes`,
+		method: "POST",
+		dataType: "json",
+		data:
+		{
+			emisor: {
+				_id: usuarioLogueado._id,
+				nombre: usuarioLogueado.nombre,
+				imagen: usuarioLogueado.foto
+			},
+			receptor: {
+				_id: idReceptor,
+				nombre: nombreReceptor,
+				imagen: fotoReceptor
+			},
+			ultimoMensaje: message,
+			fechaConversacion: horaS.toLocaleTimeString(),
+			mensajes: [{
+				contenido: message,
+				hora: horaS.toLocaleTimeString()
+			}]
+		},
+		success: (res) => {
+			console.log("esta es mi data ", res);
+			$('<li class="replies"><img src = ' + usuarioLogueado.foto + ' alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+			$('.message-input input').val(null);
+			$('.contact.active .preview').html('<span>You: </span>' + message);
+			$(".messages").animate({ scrollTop: $(document).height() }, "fast");
+		},
+		error: (error) => {
+			console.error("este es un error", error);
+		}
+	});
+};
+
+/*$('.submit').click(function() {
+  enviarMensaje();
+});*/
+
+$(window).on('keydown', function (e) {
+	if (e.which == 13) {
+		enviarMensaje();
+		return false;
+	}
+});
+
+/*$.ajax({
+		url:`http://localhost:8888/usuarios/${id}/conversaciones`,
+		method:"GET",
+		dataType:"json",
+		data:{},
+		success:(res)=>{
 			console.log(res);
 			for (let i = 0; i < res.length; i++) {
 				if(res[i].horaUltimoMensaje && res[i].nombreDestinatario && res[i].ultimoMensaje){
@@ -175,159 +390,8 @@ function MostrarConversaciones(id) {
 
 				}	
 			}
-        },
-        error:(error)=>{
-            console.error(error);
-        }
-    });*/
-	
-};
-
-function CrearConversacion(id) {
-	let horaS = new Date();
-	var usuarioConversacion;
-	$.ajax({
-        url:`http://localhost:8888/usuarios/${id}`,
-        method:"GET",
-        dataType:"json",
-        data:{},
-
-        success:(res)=>{
-			usuarioConversacion = res;
-			$.ajax({
-		
-				url:'http://localhost:8888/chats',
-				method:"POST",
-				dataType:"json",
-				data:
-				{
-					idUsuario:usuarioLogueado._id,
-					nombreEmisor: usuarioLogueado.nombre,
-					imagenEmisor: usuarioLogueado.foto,
-					idUsuarioReceptor:id,
-					nombreDestinatario: usuarioConversacion.nombre,
-					imagenDestinatario: usuarioConversacion.foto,
-					fechaConversacion :  horaS.toLocaleTimeString()
-				},
-				success:(res)=>{
-					data ={
-						horaUltimoMensaje: horaS.toLocaleTimeString(),
-						imagenDestinatario: usuarioConversacion.foto,
-						nombreDestinatario:usuarioConversacion.nombre,
-						ultimoMensaje: "",
-						_id: res.chat._id
-					}
-					/*usuarios.ordenes.push(addProd);
-    				localStorage.setItem('usuarios', JSON.stringify(usuarios)); */
-					usuarioLogueado.conversaciones.push(data);
-					localStorage.setItem('usuario', JSON.stringify(usuarioLogueado)); 
-					generarInformacion();
-					$(function () {
-						$('#modal-newmessage').modal('toggle');
-					 });
-					console.log("esta es mi data ", res);
-				
-				},
-				error:(error)=>{
-					console.error("este esun error", error);
-				}
-			});
-        },
-        error:(error)=>{
-            console.error(error);
-        }
-    });
-	
-	
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-$(".messages").animate({ scrollTop: $(document).height() }, "fast");
-
-$("#profile-img").click(function() {
-	$("#status-options").toggleClass("active");
-});
-
-$(".expand-button").click(function() {
-  $("#profile").toggleClass("expanded");
-	$("#contacts").toggleClass("expanded");
-});
-
-$("#status-options ul li").click(function() {
-	$("#profile-img").removeClass();
-	$("#status-online").removeClass("active");
-	$("#status-away").removeClass("active");
-	$("#status-busy").removeClass("active");
-	$("#status-offline").removeClass("active");
-	$(this).addClass("active");
-	
-	if($("#status-online").hasClass("active")) {
-		$("#profile-img").addClass("online");
-	} else if ($("#status-away").hasClass("active")) {
-		$("#profile-img").addClass("away");
-	} else if ($("#status-busy").hasClass("active")) {
-		$("#profile-img").addClass("busy");
-	} else if ($("#status-offline").hasClass("active")) {
-		$("#profile-img").addClass("offline");
-	} else {
-		$("#profile-img").removeClass();
-	};
-	
-	$("#status-options").removeClass("active");
-});
-
-let mensajes = [];
-function enviarMensaje(id,idReceptor,nombreReceptor,fotoReceptor) {
-	message = $(".message-input input").val();
-	if($.trim(message) == '') {
-		return false;
-	}
-	let horaS = new Date();
-	console.log(fotoReceptor);
-	$.ajax({
-		url:`http://localhost:8888/chats/${id}/mensajes`,
-		method:"POST",
-		dataType:"json",
-		data:
-		{
-			emisor: {
-				_id: usuarioLogueado._id,
-				nombre:usuarioLogueado.nombre,
-				imagen: usuarioLogueado.foto
-			},
-			receptor: {
-				_id: idReceptor,
-				nombre: nombreReceptor,
-				imagen: fotoReceptor
-			},
-			ultimoMensaje: message,
-			fechaConversacion: horaS.toLocaleTimeString(),
-			mensajes: [{
-				contenido: message,
-				hora: horaS.toLocaleTimeString()
-			}]
-		},
-		success:(res)=>{
-			console.log("esta es mi data ", res);
-			$('<li class="sent"><img src="http://emilcarlsson.se/assets/mikeross.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
-			$('.message-input input').val(null);
-			$('.contact.active .preview').html('<span>You: </span>' + message);
-			$(".messages").animate({ scrollTop: $(document).height() }, "fast");
 		},
 		error:(error)=>{
-			console.error("este es un error", error);
+			console.error(error);
 		}
-	});
-};
-
-/*$('.submit').click(function() {
-  enviarMensaje();
-});*/
-
-$(window).on('keydown', function(e) {
-  if (e.which == 13) {
-    enviarMensaje();
-    return false;
-  }
-});
+	});*/
