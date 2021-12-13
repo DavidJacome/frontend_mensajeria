@@ -217,7 +217,10 @@ function CrearConversacion(id) {
 						for (let i = 0; i < res.length; i++){
 							if(id == res[i].receptor._id || id == res[i].emisor._id){
 								if(usuarioLogueado._id == res[i].receptor._id || usuarioLogueado._id == res[i].emisor._id){
-									console.log("no se crea")
+									MostrarConversaciones(res[i]._id);
+									$(function () {
+										$('#modal-newmessage').modal('toggle');
+									});
 									crear = false;
 									break;
 								}
@@ -393,6 +396,7 @@ function generarMensajes(id){
 
 				}	
 			}
+			//$("#mensajePrincipal").load("chat2.html");
 		},
 		error:(error)=>{
 			console.error(error);
