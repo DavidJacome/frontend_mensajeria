@@ -450,3 +450,31 @@ function verificar() {
 	});
 }
 
+function buscarConversacion(){
+	busqueda = document.getElementById('busquedaConversacion').value;
+	$.ajax({
+		url:`http://localhost:8888/usuarios/${usuarioLogueado._id}/conversaciones/${busqueda}`,
+		method:"GET",
+		dataType:"json",
+		data:{},
+		success:(res)=>{
+			document.getElementById('conversaciones').innerHTML = '';
+			document.getElementById('conversaciones').innerHTML = `
+			<li class="contact">
+				<div onclick ="MostrarConversaciones('${res._id}');" class="wrap">
+					<img src="${res.imagenDestinatario}" alt="" />
+					<div class="meta">
+						<p class="name">${res.nombreDestinatario}</p>
+						<p class="preview">${res.ultimoMensaje}</p>
+						<small>${res.horaUltimoMensaje}</small>
+					</div>
+				</div>
+			</li>
+			`;
+
+		},
+		error:(error)=>{
+			console.error(error);
+		}
+	});
+};
